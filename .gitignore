@@ -20,3 +20,12 @@
 # Go workspace file
 go.work
 go.work.sum
+
+.env
+logs/**/*.log
+logs/*.log
+
+backend/go_sample/tmp/
+backend/go_sample/go_sample
+
+frontend/src/node_modules

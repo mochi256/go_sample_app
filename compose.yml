@@ -1,0 +1,79 @@
+version: "3"
+services:
+  db:
+    build:
+      context: db
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: db
+    healthcheck:
+      test: "mysql -p'root' go_sample -e 'select * from health_check' 2>/dev/null|grep -P 'OK'|test `wc -l` -eq 1"
+      interval: 5s
+      timeout: 15s
+      retries: 3
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - db-vol:/var/lib/mysql/
+      - ./logs/mysql/:/var/log/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - dev-nw
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - .env
+    volumes:
+      - gopath-vol:/app/go
+      - ./backend/go_sample:/app/go/src/go_sample
+    command: sh -c "go mod download && /app/go/bin/air"
+    environment:
+      - TZ=Asia/Tokyo
+      - GOPATH=/app/go
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dev-nw
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    env_file:
+      - .env
+    volumes:
+      - ./frontend/go-sample:/app/
+    command: sh -c "npx webpack-dev-server --hot"
+    environment:
+      - TZ=Asia/Tokyo
+    depends_on:
+      - db
+    networks:
+      - dev-nw
+  nginx:
+    container_name: nginx
+    image: nginx
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - dev-nw
+volumes:
+  db-vol:
+    name: db-vol
+  gopath-vol:
+    name: gopath-vol
+networks:
+  dev-nw:
+    driver: bridge
