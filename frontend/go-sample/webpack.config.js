@@ -1,8 +1,13 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const env = process.env.NODE_ENV || 'development'
+const isDevelopment = env === 'development'
+
+
 const entries = {
-  index: "./src/jsx/index.jsx",
+  'index': "./src/jsx/index.jsx",
+  'test/index': "./src/jsx/index.jsx",
 };
 
 
@@ -10,7 +15,7 @@ module.exports = {
   entry: entries,
   output: {
     path: `${__dirname}/dist`,
-    filename: "[name].bundle.js",
+    filename: "js/[name].bundle.js",
   },
   resolve: {
     extensions: [".js", ".jsx"],
@@ -22,7 +27,7 @@ module.exports = {
       watch: true,
     },
   },
-  mode: "development",
+  mode: isDevelopment ? "development" : "production",
   module: {
     rules: [
       {
@@ -39,7 +44,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: 'css/[name].css',
     }),
     ...Object.keys(entries).map(k => (
     new HtmlWebpackPlugin({
@@ -50,7 +55,7 @@ module.exports = {
     })
   ))
   ],
-  devtool: 'source-map',
+  devtool: isDevelopment ? 'source-map' : false,
   watchOptions: {
     ignored: /node_modules/
   }
