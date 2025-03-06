@@ -1,11 +1,16 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import axios from 'axios';
+import getCookieValue from '../lib/cookie';
 import '../sass/index.scss'
 
+export const Test = () => (
+  <div>aaaaa</div>
+);
 
-const App = () => {
+export const App = () => {
   const [status, setStatus] = React.useState('Waiting...');
+  const auth_token = getCookieValue("auth_token");
 
   React.useEffect(() => {
     axios.get("/api/v1/health_check")
@@ -24,12 +29,17 @@ const App = () => {
       colorClass = "err_msg";
       break;
   }
+
   return (
     <div>
-      <h1>Hello World.</h1>
+      <h1>GO sample shop</h1>
       <div>
-        <span>API status: </span>
-        <span class={colorClass}>{status}</span>
+        <span>Server status: </span>
+        <span className={colorClass}>{status}</span>
+      </div>
+      <div>
+        <div>
+        </div>
       </div>
     </div>
   )

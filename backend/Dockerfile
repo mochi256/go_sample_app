@@ -1,4 +1,4 @@
-FROM golang:1.22.4-alpine3.20
+FROM golang:1.24.1-alpine3.20
 RUN apk update && apk add git
 
 WORKDIR /app/go/src/go_sample
